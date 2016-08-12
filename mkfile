@@ -1,29 +1,17 @@
-<mkbreakdancerLSF.mk
-
-BREAKDANCER_TARGETS=`{find -L data/ -name '*.final.bam' \
-	| sed \
-		-e 's#data/#results/#g' \
-		-e 's#.final.bam#.ctx#g' \
-	| sort -u \
- }
+BREAKDANCER_TARGETS=`{ ./targets_breakdance }
 
 breakdancer:V:$BREAKDANCER_TARGETS
-	for file in $BREAKDANCER_TARGETS; do
-		echo "cd `pwd`
-		mk $file" | bsub
-	done
 
-data/cfgfiles/%.cfg:	data/%.final.bam
+data/cfgfiles/%.cfg	:D:	data/%.final.bam
 	mkdir -p `dirname $target`
-	$PERL \
-		$BAM2CFG \
+	bam2cfg.pl \
 		$prereq \
 		> $target
 
-results/%.ctx	results/%.ctx.%.1.fastq	results/%.ctx.%.2.fastq:	data/cfgfiles/%.cfg
+results/%.ctx	results/%.ctx.%.1.fastq	results/%.ctx.%.2.fastq	:D:	data/cfgfiles/%.cfg
 	VAR=`echo $alltarget | awk '{print $1}'`
 	mkdir -p `dirname $target`
-	$BREAKDANCER \
-		-d \
+	breakdancer-max \
+		-d "prueba" \
 		$prereq \
 		> $VAR
