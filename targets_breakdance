@@ -1,6 +1,0 @@
-#!/bin/sh
-find -L data/ -name '*.final.bam' \
-| sed \
-	-e 's#data/#results/#g' \
-	-e 's#.final.bam#.ctx#g' \
-| sort -u
