@@ -1,7 +1,0 @@
-#!/bin/sh
-
-BREAKDANCER_TARGETS=`./targets_breakdance`
-
-for file in $BREAKDANCER_TARGETS; do
-	echo sh -c \"cd `pwd` ';' mk \'"$file"\' \" | bsub
-done
