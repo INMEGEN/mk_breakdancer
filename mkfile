@@ -1,14 +1,14 @@
-BREAKDANCER_TARGETS=`{ ./targets_breakdance }
+BREAKDANCER_TARGETS=`{ ./bin/targets }
 
-breakdancer:V:$BREAKDANCER_TARGETS
+breakdancer:V:	$BREAKDANCER_TARGETS
 
-data/cfgfiles/%.cfg	:D:	data/%.final.bam
+data/cfgfiles/%.cfg:D:	data/%.final.bam
 	mkdir -p `dirname $target`
 	bam2cfg.pl \
 		$prereq \
 		> $target
 
-results/%.ctx	results/%.ctx.%.1.fastq	results/%.ctx.%.2.fastq	:D:	data/cfgfiles/%.cfg
+results/%.ctx	results/%.ctx.%.1.fastq	results/%.ctx.%.2.fastq:D:	data/cfgfiles/%.cfg
 	VAR=`echo $alltarget | awk '{print $1}'`
 	mkdir -p `dirname $target`
 	breakdancer-max \
