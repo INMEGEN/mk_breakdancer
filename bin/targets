@@ -3,4 +3,5 @@ find -L data/ -name '*.bam' \
 | sed \
 	-e 's#data/#results/breakdancer/#g' \
 	-e 's#.bam#.ctx#g' \
-| sort -u
+| sort -u \
+| stest -ve
