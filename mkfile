@@ -6,12 +6,19 @@ results/cfgfiles/%.cfg:D:	data/%.bam
 	mkdir -p `dirname $target`
 	bam2cfg.pl \
 		$prereq \
-		> $target
+		> $target".build" \
+	&& mv $target".build" $target
 
-results/breakdancer/%.ctx	results/breakdancer/%.ctx.%.1.fastq	results/breakdancer/%.ctx.%.2.fastq:D:	results/cfgfiles/%.cfg
-	VAR=`echo $alltarget | awk '{print $1}'`
+results/breakdancer/%.ctx \
+results/breakdancer/%.ctx.%.1.fastq \
+results/breakdancer/%.ctx.%.2.fastq:D:	results/cfgfiles/%.cfg
 	mkdir -p `dirname $target`
+	FILE=`echo $stem | cut -d"_" -f1`
 	breakdancer-max \
-		-d $VAR \
+		-d $target".build" \
 		$prereq \
-		> $VAR
+		> $target".build" \
+	&& mv $target".build" $target \
+	&& mv $target".build."$FILE".1.fastq" $target"."$FILE".1.fastq" \
+	&& mv $target".build."$FILE".2.fastq" $target"."$FILE".2.fastq"
+
