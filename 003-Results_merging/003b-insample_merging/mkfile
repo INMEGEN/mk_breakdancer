@@ -1,0 +1,105 @@
+< config.mk
+MKSHELL=/bin/bash
+
+## Use external script to merge bedfiles
+results/%.sample.bed: results/%.sorted.bed #results/%.merged.bed results/%.unnecesary_merge.bed
+	set -x
+	mkdir -p `dirname $target`
+	bin/bed_merger.sh $prereq $target
+#	cat $prereq \
+#	| sort -V \
+#	> $target.build \
+#	&& mv $target.build $target
+#
+# ## This merges the record that needs merging
+# results/%.merged.bed: results/%.to_merge.bed
+# #	set -x
+	# mkdir -p `dirname $target`
+	# {
+	# while read SV
+	# do
+# #		SV_EVENTS=`echo $SV | tr "|" "\n" | tr ";" "\n"`
+# #		echo $SV_EVENTS
+# #		echo "CHR"
+		# CHR=`echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f1 | sort -u`
+# #		echo "STARTS"
+# #		echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f2 | sort -u
+# #		echo "MIN START"
+		# MIN_START=`echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f2 | sort -n | head -n1`
+# #		echo "ENDS"
+# #		echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f3 | sort -u
+# #		echo "MAX END"
+		# MAX_END=`echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f3 | sort -n | tail -n1`
+# #		echo "SAMPLES"
+		# SAMPLES=`echo $SV | tr "|" "\n" | tr ";" "\n" | cut -d" " -f4 | sort -u | tr "\n" "," | sed "s#,\\$##"`
+		# echo $CHR $MIN_START $MAX_END $SAMPLES | tr " " "\t"
+	# done < $prereq
+	# } | sort -V -u > $target.build \
+	# && mv $target.build $target
+#
+# ## This extracts lines that require merging
+# results/%.to_merge.bed: results/%.intermediate_from_bedmap.bed
+	# set -x
+	# mkdir -p `dirname $target`
+		# awk 'BEGIN {FS="|"; OFS="|"} $1!=$2 {print $0}' $prereq \
+	# > $target.build \
+	# && mv $target.build $target
+#
+# ## This extracts records that does not need merging
+# results/%.unnecesary_merge.bed: results/%.intermediate_from_bedmap.bed
+	# set -x
+	# mkdir -p `dirname $target`
+	# awk 'BEGIN {FS="|"; OFS="|"} $1==$2 {print $1}' $prereq \
+	# > $target.build \
+	# && mv $target.build $target
+#
+# results/%.intermediate_from_bedmap.bed: results/%.sorted.bed
+	# set -x
+	# mkdir -p `dirname $target`
+	# $BEDMAP --echo --echo-map --fraction-both $OVERLAP $prereq \
+	# > $target.build \
+	# && mv $target.build $target
+
+results/%.sorted.bed: data/%.ctx
+	set -x
+	mkdir -p `dirname $target`
+	awk -v sample="$stem" '
+		BEGIN {FS="\t"; OFS="\t"}
+		{ print $1,$2,$5,sample}
+		' $prereq \
+	| grep -w \
+		-e "^chr1" \
+		-e "^chr2" \
+		-e "^chr3" \
+		-e "^chr4" \
+		-e "^chr5" \
+		-e "^chr6" \
+		-e "^chr7" \
+		-e "^chr8" \
+		-e "^chr9" \
+		-e "^chr10" \
+		-e "^chr11" \
+		-e "^chr12" \
+		-e "^chr13" \
+		-e "^chr14" \
+		-e "^chr15" \
+		-e "^chr16" \
+		-e "^chr17" \
+		-e "^chr18" \
+		-e "^chr19" \
+		-e "^chr20" \
+		-e "^chr21" \
+		-e "^chr22" \
+		-e "^chrX" \
+		-e "^chrY" \
+	| sort -V > $target.build \
+	&& mv $target.build $target
+
+## Clean intermediate files
+clean:V:
+	set -x
+	echo "Removing unnecesary temporary results"
+	find -L results/ \
+		-type f \
+		! -name "*.sample.bed" \
+	-exec rm {} \;

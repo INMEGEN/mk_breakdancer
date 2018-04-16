@@ -1,0 +1,11 @@
+#!/bin/bash
+
+## Not going to operate on CTX or ITC translocations
+find -L data/ \
+	-type f \
+	-name "*.ctx" \
+	! -name "*.CTX.*" \
+	! -name "*.ITX.*" \
+| sed \
+	-e "s#data/#results/#" \
+	-e "s#.ctx#.sample.bed#"
